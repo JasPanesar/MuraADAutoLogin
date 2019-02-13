@@ -3,12 +3,13 @@ component extends="mura.cfobject" {
 		variables.LDAPUsername='';
 		variables.LDAPpassword='';
 		variables.rejectURL='';
+		variables.siteid='default';
 
 		function onGlobalRequestStart(m){
 
 			if(request.muraSessionManagement && !m.currentUser().isLoggedIn()){
 
-				var siteid=getBean('contentServer').bindToDomain();
+				//set this to try to by pass for testing other things while not logged in
 				var letmein=false;
 
 				if(findNoCase('domain\',CGI.REMOTE_USER) gt 0){
@@ -24,7 +25,7 @@ component extends="mura.cfobject" {
 						attributes = "cn,o,l,st,sn,c,mail,telephonenumber, givenname, streetaddress, postalcode, SamAccountname, physicalDeliveryOfficeName, department, title");
 
 						if(LDAPResults.recordcount){
-							arguments.m.event('siteid',siteid);
+							arguments.m.event('siteid',variables.siteid);
 
 							//check to see if the user has previous login into the system
 							var userBean=$.getBean('user').loadBy(username=SamAccountname);
@@ -51,13 +52,13 @@ component extends="mura.cfobject" {
 							}
 
 
-							$.getBean("userUtility").loginByUserID(userBean.getUserID(),siteid);
+							$.getBean("userUtility").loginByUserID(userBean.getUserID(),variables.siteid);
 
 							//set siteArray
 							if(session.mura.isLoggedIn){
 								session.siteArray=[];
 								settingsManager = $.getBean("settingsManager");
-								for( site in settingsManager.getSites()) {
+								for( var site in settingsManager.getSites()) {
 									if(application.permUtility.getModulePerm("00000000000000000000000000000000000",site)){
 										arrayAppend(session.siteArray,site);
 									}
