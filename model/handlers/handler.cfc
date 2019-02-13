@@ -57,7 +57,7 @@ component extends="mura.cfobject" {
 							//set siteArray
 							if(session.mura.isLoggedIn){
 								session.siteArray=[];
-								settingsManager = $.getBean("settingsManager");
+								var settingsManager = $.getBean("settingsManager");
 								for( var site in settingsManager.getSites()) {
 									if(application.permUtility.getModulePerm("00000000000000000000000000000000000",site)){
 										arrayAppend(session.siteArray,site);
