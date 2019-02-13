@@ -1,7 +1,11 @@
 component extends="mura.cfobject" {
+		variables.LDAPServer='';
+		variables.LDAPUsername='';
+		variables.LDAPpassword='';
+		variables.rejectURL='';
 
 		function onGlobalRequestStart(m){
-			
+
 			if(request.muraSessionManagement && !m.currentUser().isLoggedIn()){
 
 				var siteid=getBean('contentServer').bindToDomain();
@@ -11,12 +15,12 @@ component extends="mura.cfobject" {
 					var SamAccountname=ucase(replacenocase(CGI.REMOTE_USER, 'domain\', ""));
 
 					cfldap(action="query",
-						server="",
+						server=variables.LDAPServer,
 						name="LDAPResults",
 						start="",
 						filter="(&(objectclass=user)(SamAccountName=#SamAccountname#))",
-						username="",
-						password="",
+						username=variables.LDAPUsername,
+						password=variables.LDAPpassword,
 						attributes = "cn,o,l,st,sn,c,mail,telephonenumber, givenname, streetaddress, postalcode, SamAccountname, physicalDeliveryOfficeName, department, title");
 
 						if(LDAPResults.recordcount){
@@ -60,20 +64,11 @@ component extends="mura.cfobject" {
 								}
 							}
 
-							SESSION.INETSEC.UID = LDAPResults.SamAccountname;
 						} else if(!letmein){
-							location(url="http://www.regalmed.com", addtoken=false);
-						} else {
-							SESSION.INETSEC.UID = CGI.REMOTE_USER;
+							location(url=variables.rejectURL, addtoken=false);
 						}
 				} else if(!letmein) {
-					location(url="http://www.regalmed.com", addtoken=false);
-				} else {
-					SESSION.INETSEC.UID = CGI.REMOTE_USER;
-				}
-
-				if(letmein){
-					SESSION.INETSEC.UID = CGI.REMOTE_USER;
+					location(url=variables.rejectURL, addtoken=false);
 				}
 
 			}
